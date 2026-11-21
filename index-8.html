@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reg Portal</title>
+<style>
+  :root {
+    --green-900: #0a3d2e;
+    --green-700: #0f6b4f;
+    --green-600: #14855f;
+    --green-50: #eaf6f0;
+    --orange: #f57c1f;
+    --orange-dark: #d9650f;
+    --orange-50: #fff1e3;
+    --bg: #f3f8f5;
+    --surface: #ffffff;
+    --ink: #12241c;
+    --muted: #5b6e64;
+    --line: #dbe7e0;
+    --danger: #c0392b;
+    --ok: #0f6b4f;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--green-900), var(--green-600));
+    color: #fff; padding: 22px 16px 54px;
+    border-bottom: 5px solid var(--orange);
+  }
+  .hero-inner, .wrap { max-width: 560px; margin: 0 auto; }
+  .hero-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 42px; height: 42px; border-radius: 12px; background: var(--orange);
+    display: grid; place-items: center; font-weight: 800; font-size: 1.2rem; color: #fff;
+  }
+  .hero h1 { font-size: 1.35rem; margin: 0; letter-spacing: -0.01em; }
+  .hero small { display: block; opacity: .85; font-size: .82rem; }
+  .wrap { padding: 0 16px 60px; margin-top: -34px; }
+  h2 { font-size: 1.1rem; margin: 0 0 6px; color: var(--green-900); }
+  .muted { color: var(--muted); font-size: .9rem; margin: 0 0 12px; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    padding: 20px; box-shadow: 0 10px 30px rgba(10, 61, 46, .10);
+  }
+  label { display: block; font-weight: 600; font-size: .9rem; margin: 14px 0 6px; color: var(--green-900); }
+  input[type=text], input[type=email], input[type=password], input[type=search], textarea {
+    width: 100%; padding: 14px; font: inherit; color: var(--ink);
+    background: #fff; border: 1.5px solid var(--line); border-radius: 12px;
+  }
+  input:focus, textarea:focus { border-color: var(--green-600); outline: none; box-shadow: 0 0 0 4px var(--green-50); }
+  textarea { min-height: 150px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9rem; }
+  input[type=file] { width: 100%; padding: 10px; border: 1.5px dashed var(--green-600); border-radius: 12px; background: var(--green-50); }
+  button {
+    font: inherit; font-weight: 700; cursor: pointer; border-radius: 12px;
+    padding: 13px 18px; border: 0; background: var(--orange); color: #fff;
+    transition: background .15s;
+  }
+  button:hover { background: var(--orange-dark); }
+  button:focus-visible { outline: 3px solid var(--green-600); outline-offset: 2px; }
+  button.ghost { background: transparent; color: var(--green-700); border: 1.5px solid var(--green-600); }
+  button.ghost:hover { background: var(--green-50); }
+  .hero button.ghost { color: #fff; border-color: rgba(255,255,255,.6); }
+  .hero button.ghost:hover { background: rgba(255,255,255,.12); }
+  button.danger { background: transparent; color: var(--danger); border: 1.5px solid var(--danger); }
+  button.danger:hover { background: #fdecea; }
+  button.small { padding: 8px 12px; font-size: .85rem; border-radius: 10px; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; background: #fff; padding: 6px; border-radius: 16px; border: 1px solid var(--line); }
+  .tabs button { flex: 1; background: transparent; color: var(--muted); padding: 11px; }
+  .tabs button:hover { background: var(--green-50); }
+  .tabs button[aria-selected=true] { background: var(--green-700); color: #fff; }
+  .hidden { display: none !important; }
+  .result {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 0; border-top: 1px solid var(--line);
+  }
+  .result:first-child { border-top: 0; }
+  .result .who { font-weight: 600; word-break: break-word; }
+  .code {
+    font: 800 1.45rem ui-monospace, Menlo, Consolas, monospace;
+    background: var(--orange-50); color: var(--orange-dark); border: 1.5px solid var(--orange);
+    padding: 4px 12px; border-radius: 10px; letter-spacing: .04em; word-break: break-all;
+  }
+  .status { min-height: 1.4em; font-size: .92rem; margin-top: 12px; }
+  .status.err { color: var(--danger); }
+  .status.ok { color: var(--ok); font-weight: 600; }
+  .empty { color: var(--muted); padding: 14px 0 4px; }
+  .banner { background: #fff; border: 1.5px dashed var(--orange); border-radius: 14px; padding: 16px; margin-bottom: 16px; color: var(--orange-dark); }
+  .counter { font-size: .85rem; color: var(--green-700); font-weight: 600; }
+  progress { width: 100%; height: 10px; margin-top: 10px; accent-color: var(--orange); }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+</style>
+</head>
+<body>
+<div class="hero"><div class="hero-inner">
+  <div class="brand"><div class="logo">R</div><div><h1>Reg Portal</h1><small>Names and codes, all in one place</small></div></div>
+  <button id="logoutBtn" class="ghost small hidden">Sign out</button>
+</div></div>
+<div class="wrap">
+
+  <div id="setupBanner" class="banner hidden">
+    Supabase is not connected yet. Open this file, find <b>SUPABASE_URL</b> and
+    <b>SUPABASE_ANON_KEY</b> near the bottom, and paste your project values.
+  </div>
+
+  <!-- Login -->
+  <section id="loginView" class="hidden">
+    <div class="panel">
+      <h2>Sign in</h2>
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" inputmode="email">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password">
+      <div class="row"><button id="loginBtn">Sign in</button></div>
+      <div id="loginStatus" class="status" role="status"></div>
+    </div>
+  </section>
+
+  <!-- App -->
+  <section id="appView" class="hidden">
+    <div class="tabs" role="tablist">
+      <button id="tabSearch" role="tab" aria-selected="true">Search</button>
+      <button id="tabUpload" role="tab" aria-selected="false">Add a name</button>
+    </div>
+
+    <div id="searchPane" class="panel">
+      <div class="tabs" style="margin-bottom:6px">
+        <button id="modeName" aria-selected="true">Search by name</button>
+        <button id="modeCode" aria-selected="false">Search by code</button>
+      </div>
+      <label id="qLabel" for="q" style="margin-top:8px">Type a name</label>
+      <input id="q" type="search" placeholder="e.g. Okon Bassey" autocomplete="off">
+      <div id="results" aria-live="polite"></div>
+      <div id="total" class="counter" style="margin-top:12px"></div>
+    </div>
+
+    <div id="uploadPane" class="panel hidden">
+      <h2>Save a name and code</h2>
+      <label for="oneName">Name</label>
+      <input id="oneName" type="text" autocomplete="off">
+      <label for="oneCode">Code</label>
+      <input id="oneCode" type="text" autocomplete="off">
+      <div class="row"><button id="oneBtn">Save to database</button></div>
+      <div id="oneStatus" class="status" role="status"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // ====== PASTE YOUR SUPABASE VALUES HERE ======
+  const SUPABASE_URL = "https://nlhykdgpneynozwzuylk.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5saHlrZGdwbmV5bm96d3p1eWxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4Njg0NzAsImV4cCI6MjEwNjQ0NDQ3MH0.-_KKSRsz_jLDveSH6kX7vjTCRabF2Eqd3bXR4ekJ_1c";
+  // =============================================
+
+  const $ = (id) => document.getElementById(id);
+  const configured = !SUPABASE_URL.startsWith("PASTE") && !SUPABASE_ANON_KEY.startsWith("PASTE");
+  let db = null;
+  let searchMode = "name";
+
+  function setStatus(el, msg, kind) {
+    el.textContent = msg || "";
+    el.className = "status" + (kind ? " " + kind : "");
+  }
+
+  function show(view) {
+    $("loginView").classList.toggle("hidden", view !== "login");
+    $("appView").classList.toggle("hidden", view !== "app");
+    $("logoutBtn").classList.toggle("hidden", view !== "app");
+  }
+
+  function switchTab(which) {
+    const search = which === "search";
+    $("searchPane").classList.toggle("hidden", !search);
+    $("uploadPane").classList.toggle("hidden", search);
+    $("tabSearch").setAttribute("aria-selected", search);
+    $("tabUpload").setAttribute("aria-selected", !search);
+    if (search) $("q").focus();
+  }
+
+  /* ---------- Auth ---------- */
+  async function login() {
+    const btn = $("loginBtn");
+    btn.disabled = true;
+    setStatus($("loginStatus"), "Signing in...");
+    const { error } = await db.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+    btn.disabled = false;
+    if (error) return setStatus($("loginStatus"), "Wrong email or password.", "err");
+    setStatus($("loginStatus"), "");
+    $("password").value = "";
+    enterApp();
+  }
+
+  async function logout() {
+    await db.auth.signOut();
+    $("results").innerHTML = "";
+    $("q").value = "";
+    show("login");
+  }
+
+  function enterApp() {
+    show("app");
+    switchTab("search");
+    refreshTotal();
+  }
+
+  /* ---------- Search ---------- */
+  function setMode(mode) {
+    searchMode = mode;
+    $("modeName").setAttribute("aria-selected", mode === "name");
+    $("modeCode").setAttribute("aria-selected", mode === "code");
+    $("qLabel").textContent = mode === "name" ? "Type a name" : "Type a code";
+    $("q").placeholder = mode === "name" ? "e.g. Okon Bassey" : "e.g. A1042";
+    $("q").value = "";
+    $("results").innerHTML = "";
+    $("q").focus();
+  }
+
+  async function refreshTotal() {
+    const { count } = await db.from("code_finder_records").select("id", { count: "exact", head: true });
+    $("total").textContent = count == null ? "" : count.toLocaleString() + " records stored";
+  }
+
+  let timer;
+  function onType() {
+    clearTimeout(timer);
+    timer = setTimeout(runSearch, 250);
+  }
+
+  async function runSearch() {
+    const text = $("q").value.trim().replace(/[%_,()\\]/g, " ");
+    const box = $("results");
+    if (text.length < 2) { box.innerHTML = ""; return; }
+
+    let query = db.from("code_finder_records").select("id, name, code").limit(20);
+    if (searchMode === "code") {
+      query = query.ilike("code", "%" + text.replace(/\s+/g, "") + "%");
+    } else {
+      text.split(/\s+/).filter(Boolean).forEach(word => {
+        query = query.ilike("name", "%" + word + "%");
+      });
+    }
+    const { data, error } = await query.order("name");
+
+    box.innerHTML = "";
+    if (error) {
+      const d = document.createElement("div");
+      d.className = "status err";
+      d.textContent = "Search failed. Check your connection and sign in again.";
+      return box.appendChild(d);
+    }
+    if (!data.length) {
+      const d = document.createElement("div");
+      d.className = "empty";
+      d.textContent = "No match for \"" + text + "\". " + (searchMode === "code" ? "Check the code and try again." : "Try fewer letters or another spelling.");
+      return box.appendChild(d);
+    }
+    data.forEach(row => {
+      const r = document.createElement("div");
+      r.className = "result";
+      const left = document.createElement("div");
+      left.className = "who";
+      left.textContent = row.name;
+      const right = document.createElement("div");
+      right.style.textAlign = "right";
+      const code = document.createElement("div");
+      code.className = "code";
+      code.textContent = row.code;
+      const copy = document.createElement("button");
+      copy.className = "ghost small";
+      copy.style.marginTop = "8px";
+      copy.textContent = "Copy code";
+      copy.onclick = async () => {
+        try { await navigator.clipboard.writeText(row.code); copy.textContent = "Copied"; }
+        catch { copy.textContent = "Copy failed"; }
+        setTimeout(() => copy.textContent = "Copy code", 1500);
+      };
+      const del = document.createElement("button");
+      del.className = "danger small";
+      del.style.marginTop = "8px";
+      del.style.marginLeft = "6px";
+      del.textContent = "Delete";
+      del.onclick = async () => {
+        if (!confirm("Delete " + row.name + " (" + row.code + ") from the database? This cannot be undone.")) return;
+        del.disabled = true;
+        const { data: gone, error: delErr } = await db.from("code_finder_records")
+          .delete().eq("id", row.id).select("id");
+        if (delErr || !gone || !gone.length) {
+          del.disabled = false;
+          alert("Could not delete. Check your connection and try again.");
+          return;
+        }
+        r.remove();
+        if (!box.querySelector(".result")) {
+          const d = document.createElement("div");
+          d.className = "empty";
+          d.textContent = "Deleted. No other matches.";
+          box.appendChild(d);
+        }
+        refreshTotal();
+      };
+      right.append(code, copy, del);
+      r.append(left, right);
+      box.appendChild(r);
+    });
+  }
+
+  /* ---------- Save ---------- */
+  async function addOne() {
+    const name = $("oneName").value.trim().replace(/\s+/g, " ");
+    const code = $("oneCode").value.trim();
+    const s = $("oneStatus");
+    if (!name || !code) return setStatus(s, "Enter both a name and a code.", "err");
+    const { error } = await db.from("code_finder_records")
+      .upsert([{ name, code }], { onConflict: "name_key,code", ignoreDuplicates: true });
+    if (error) return setStatus(s, error.message, "err");
+    setStatus(s, name + " saved.", "ok");
+    $("oneName").value = ""; $("oneCode").value = "";
+    refreshTotal();
+  }
+
+  /* ---------- Wire up ---------- */
+  async function init() {
+    if (!configured) {
+      $("setupBanner").classList.remove("hidden");
+      return;
+    }
+    if (typeof supabase === "undefined") {
+      $("setupBanner").textContent = "Could not load the app files. Check your internet connection and refresh the page.";
+      $("setupBanner").classList.remove("hidden");
+      show("login");
+      return;
+    }
+    let storageOk = true;
+    try { localStorage.setItem("rp_test", "1"); localStorage.removeItem("rp_test"); } catch (e) { storageOk = false; }
+    const mem = {};
+    const memStore = { getItem: k => mem[k] ?? null, setItem: (k, v) => { mem[k] = v; }, removeItem: k => { delete mem[k]; } };
+    try {
+      db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,
+        storageOk ? {} : { auth: { storage: memStore, persistSession: false, autoRefreshToken: true } });
+    } catch (e) {
+      $("setupBanner").textContent = "Could not start: " + e.message;
+      $("setupBanner").classList.remove("hidden");
+      show("login");
+      return;
+    }
+    show("login");
+
+    $("loginBtn").onclick = login;
+    $("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+    $("logoutBtn").onclick = logout;
+    $("tabSearch").onclick = () => switchTab("search");
+    $("tabUpload").onclick = () => switchTab("upload");
+    $("modeName").onclick = () => setMode("name");
+    $("modeCode").onclick = () => setMode("code");
+    $("q").addEventListener("input", onType);
+    $("oneBtn").onclick = addOne;
+    $("oneCode").addEventListener("keydown", e => { if (e.key === "Enter") addOne(); });
+
+    try {
+      const { data } = await db.auth.getSession();
+      if (data.session) enterApp();
+    } catch (e) { /* stay on login */ }
+  }
+  function loadSupabase() {
+    const urls = [
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js",
+      "https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/umd/supabase.min.js"
+    ];
+    return new Promise(resolve => {
+      let i = 0;
+      const next = () => {
+        if (typeof supabase !== "undefined" || i >= urls.length) return resolve();
+        const sc = document.createElement("script");
+        sc.src = urls[i++];
+        sc.onload = () => resolve();
+        sc.onerror = next;
+        document.head.appendChild(sc);
+      };
+      next();
+    });
+  }
+  loadSupabase().then(init);
+</script>
+</body>
+</html>
